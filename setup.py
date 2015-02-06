@@ -49,7 +49,7 @@ setup(
     license = license,
     description = 'A simple python lib to print data as ascii histograms.',
     long_description = description,
-    install_requires = [],
+    install_requires = ['PyYAML'],
     tests_require=['pytest'],
     cmdclass={'test': PyTest},
     classifiers=[
