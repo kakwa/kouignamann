@@ -1,0 +1,12 @@
+fversion: 0.0.1
+---
+ips:
+    # virtual ip 1
+    - hostname: sw1
+      ip: 192.168.0.2
+      aliases: [sw1al1, sw1al2]
+    # virtual ip 2
+    - hostname: sw2
+      ip: 192.168.0.3
+      aliases: [sw2al1, sw2al2]
+---

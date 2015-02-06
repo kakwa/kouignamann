@@ -1,0 +1,36 @@
+partitionings:
+    # partitioning 1
+    - name: part1
+      volume-groups:
+          - device: /dev/sda
+            parts:
+                - name: ROOT
+                  size: 1024
+                  mount-point: /
+                - name: USR
+                  size: 5120
+                  mount-point: /usr
+                - name: VAR
+                  size: 5120
+                  mount-point: /var
+                  grow: true
+          - device: /dev/sdb
+            parts:
+                - name: DATA
+                  size: 1024
+                  mount-point: /var/data
+    # partitioning 2
+    - name: part2
+      volume-groups:
+          - device: /dev/sda
+            parts:
+                - name: ROOT
+                  size: 1024
+                  mount-point: /
+                - name: USR
+                  size: 4096
+                  mount-point: /usr
+                - name: VAR
+                  size: 5120
+                  mount-point: /var
+                  grow: true
