@@ -16,13 +16,6 @@ class YamlLoad:
                     raise NameError('Duplicate')
         return merged
 
-    def monkeyYmlLoad(self, stream):
-        loader = MyLoader(stream)
-        try:
-            return loader.get_single_data()
-        finally:
-            loader.dispose()
-
     def load(self):
         ymlDir = os.path.join(self.inventory_dir, self.subDir)
         ymlFiles = []
