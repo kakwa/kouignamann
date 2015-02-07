@@ -1,0 +1,15 @@
+conf1:
+    ram: 4096
+    cpus: 4
+    bootloader: uefi
+    arch: amd64
+    os: debian
+    version: 8
+
+conf2:
+    ram: 256
+    cpus: 1
+    bootloader: bios
+    arch: i386
+    os: centos
+    version: 7

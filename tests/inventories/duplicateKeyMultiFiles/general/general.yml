@@ -1,0 +1,8 @@
+# mandatory paramters
+dns: 192.168.0.1
+domain: example.com
+
+# free parameters
+rootpwd: password
+puppetserver: puppet.example.com
+mirror: http://mirror.example.com/
