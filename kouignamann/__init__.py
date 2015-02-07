@@ -3,6 +3,7 @@
 import os
 import sys
 from pyyamlwrapper import loadNoDump
+from errors import RelationError, DumplicatedKey
 
 class YamlLoad:
 
@@ -13,7 +14,7 @@ class YamlLoad:
                 if k not in merged:
                     merged [k] = v
                 else:
-                    raise NameError('Duplicate')
+                    raise DumplicatedKey(k, self.subDir)
         return merged
 
     def load(self):
@@ -67,7 +68,7 @@ class Inventory:
     def checkRelation(self, hosts, subinv, key):
         for host in hosts:
             if not hosts[host][key] in subinv:
-                raise NameError('missing key') 
+                raise RelationError(host, key)
 
     def load(self):
         tmp_hosts          = self.hostsObj.load()

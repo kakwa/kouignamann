@@ -1,4 +1,4 @@
-conf1:
+hw1:
     ram: 4096
     cpus: 4
     bootloader: uefi
@@ -6,7 +6,7 @@ conf1:
     os: debian
     version: 8
 
-conf2:
+hw2:
     ram: 256
     cpus: 1
     bootloader: bios
