@@ -1,7 +1,46 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 import kouignamann
+import sys
+from optparse import OptionParser
 
-inv = kouignamann.Inventory('./inventory')
+if __name__ == '__main__':
+    usage = "usage: %prog [-i <inventory directory>] [-f filter] [-k keys]\n\n"\
+            "examples:\n"\
+            "   %prog -i './inventory/'"
 
+    parser = OptionParser(usage=usage)
+    parser.add_option("-f", "--filter", dest="filter", 
+            help="search filter",
+            metavar="FILTER")
+    parser.add_option("-k", "--keys", dest="keys", 
+            help="keys to recover",
+            metavar="KEY")
+    parser.add_option("-i", "--inventory", dest="inventory", 
+            help="inventory directory", 
+            metavar="INVDIR")
+
+    (options, args) = parser.parse_args()
+
+    data=[]
+    if options.inventory is None:
+        print("ERROR: missing inventory directory", file=sys.stderr)
+        sys.exit(1)
+    try:
+        inv = kouignamann.Inventory(options.inventory)
+    except kouignamann.errors.DumplicatedKey as e:
+        print("ERROR: duplicated entry '%(host)s' in '%(key)s'" \
+                % { 'key': e.key, 'host': e.host }, file=sys.stderr)
+        sys.exit(1)
+    except kouignamann.errors.RelationError as e:
+        print("ERROR: missing inventory directory", file=sys.stderr)
+        sys.exit(1)
+
+
+    print(inv.general)
+    print(inv.virtualips)
+    print(inv.hardwares)
+    print(inv.partitionings)
+    print(inv.hosts)
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
