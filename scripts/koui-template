@@ -25,10 +25,15 @@ if __name__ == '__main__':
     parser.add_option("-o", "--outdir", dest="outdir",
             help="out directory (mandatory)", 
             metavar="OUTDIR")
+    parser.add_option("-m", "--mode", dest="mode",
+            help="mode 'global' or 'byhost' (mandatory)", 
+            metavar="OUTDIR")
+
     (options, args) = parser.parse_args()
 
     data = {}
     node      = options.node
+    template  = options.template
     inventory = options.inventory
 
     if inventory is None:
@@ -48,9 +53,8 @@ if __name__ == '__main__':
         print("ERROR: node '%(node)s' not in inventory" % {'node': node}, file=sys.stderr)
         sys.exit(1)
 
-    if not node is None:
-        pass
-    else:
-        pass
-
+    res=inv.templateRender(template, node)
+    for r in res:
+        print(r + ':')
+        print(res[r])
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4

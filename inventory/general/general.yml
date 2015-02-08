@@ -1,5 +1,6 @@
 # mandatory paramters
-dns: 192.168.0.1
+dnsip: 192.168.0.1
+dns: ns 
 domain: example.com
 
 # free parameters

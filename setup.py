@@ -54,7 +54,7 @@ setup(
     license = license,
     description = 'A simple python lib to print data as ascii histograms.',
     long_description = description,
-    install_requires = ['PyYAML'],
+    install_requires = ['PyYAML', 'Mako'],
     tests_require=['pytest'],
     cmdclass={'test': PyTest},
     classifiers=[

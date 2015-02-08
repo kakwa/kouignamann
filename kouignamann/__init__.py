@@ -6,6 +6,7 @@ import re
 import yaml
 from kouignamann.pyyamlwrapper import loadNoDump
 from kouignamann.errors import RelationError, DumplicatedKey
+from mako.template import Template
 
 categories = ['partitionings','virtual-ips','hosts','hardwares', 'general']
 
@@ -145,6 +146,22 @@ class Inventory:
 
     def format(self, document):
         return yaml.dump(document, default_flow_style=False)
+
+    def templateRender(self, template, node=None, mode='byhost'):
+        mytemplate = Template(filename=template)
+        if mode == 'byhost':
+            result = {}
+            if node is None:
+                for host in self.hosts:
+                    result[host]=mytemplate.render(general=self.general, host=self.hosts[host])
+            else:
+                if self._search(self.hosts[node], filters):
+                    result[node]=mytemplate.render(general=self.general, host=self.hosts[node])
+        elif mode == 'global':
+            result=mytemplate.render(general=self.general, hosts=self.hosts)
+        return result
+
+
                     
     def load(self):
         tmp_hosts          = self.hostsObj.load()
