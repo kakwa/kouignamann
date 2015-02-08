@@ -44,7 +44,7 @@ setup(
     author = 'Pierre-Francois Carpentier',
     author_email = 'carpentier.pf@gmail.com',
     packages = ['kouignamann'],
-    scripts = ['scripts/koui-template', 'scripts/koui-query'],
+    scripts = ['scripts/koui-template', 'scripts/koui-query-hosts'],
     url = 'https://github.com/kakwa/kouignamann',
     license = license,
     description = 'A simple python lib to print data as ascii histograms.',
