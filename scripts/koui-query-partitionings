@@ -1,0 +1,53 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+from __future__ import print_function
+import kouignamann
+import sys
+import re
+from optparse import OptionParser
+
+if __name__ == '__main__':
+
+    usage = "usage: %prog -i <inventory directory> [-f filter] [-k keys] [-n node]\n\n"\
+            "examples:\n"\
+            "   %prog -i inventory/  -k 'dns'"
+
+    parser = OptionParser(usage=usage)
+    parser.add_option("-i", "--inventory", dest="inventory", 
+            help="inventory directory (mandatory)", 
+            metavar="INVDIR")
+
+    parser.add_option("-k", "--value", dest="node",
+            help="key to recover (optional)", 
+            metavar="KEY")
+    (options, args) = parser.parse_args()
+
+    data = {}
+    node      = options.node
+    inventory = options.inventory
+
+    if inventory is None:
+        print("ERROR: missing inventory directory", file=sys.stderr)
+        sys.exit(1)
+    try:
+        inv = kouignamann.Inventory(inventory)
+    except kouignamann.errors.DumplicatedKey as e:
+        print("ERROR: duplicated entry '%(host)s' in '%(key)s'" \
+                % { 'key': e.key, 'host': e.host }, file=sys.stderr)
+        sys.exit(1)
+    except kouignamann.errors.RelationError as e:
+        print("ERROR: missing inventory directory", file=sys.stderr)
+        sys.exit(1)
+
+    if not node is None and not node in inv.partitionings:
+        print("ERROR: node '%(node)s' not in inventory" % {'node': node}, file=sys.stderr)
+        sys.exit(1)
+
+    if not node is None:
+        data[node] = inv.partitionings[node]
+    else:
+        data = inv.partitionings
+
+    print(inv.format(data))
+
+# vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
