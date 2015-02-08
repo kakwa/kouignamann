@@ -2,8 +2,12 @@
 
 import os
 import sys
+import re
+import yaml
 from kouignamann.pyyamlwrapper import loadNoDump
 from kouignamann.errors import RelationError, DumplicatedKey
+
+categories = ['partitionings','virtual-ips','hosts','hardwares', 'general']
 
 class YamlLoad:
 
@@ -72,7 +76,46 @@ class Inventory:
         for host in hosts:
             if not hosts[host][key] in subinv:
                 raise RelationError(host, key)
+            else:
+                hosts[host][key] = subinv[hosts[host][key]]
 
+    def getPartition(self, host):
+        return self.partitionings[self.hosts[host]['partitioning']]
+
+    def getHardware(self, host):
+        return self.partitionings[self.hosts[host]['hardware']]
+
+    def _search(self, data, filters):
+        if type(data) is list:
+            for item in data:
+                if self._search(item, filters):
+                    return True
+        elif type(data) is dict:
+            for key in data:
+                if key in filters and re.match(filters[key], data[key]):
+                    return True
+                elif type(data[key]) is list or type(data[key]) is dict:
+                    if self._search(data[key], filters):
+                        return True
+        else:
+            return False
+
+    def search(self, filters):
+        matchHost = {}
+        for host in self.hosts:
+            if self._search(self.hosts[host], filters):
+                matchHost[host]=self.hosts[host]
+        return matchHost
+
+    def _select(self, data, fields):
+        pass
+
+    def select(self, data, fields):
+        pass
+
+    def format(self, document):
+        return yaml.dump(document, default_flow_style=False)
+                    
     def load(self):
         tmp_hosts          = self.hostsObj.load()
         tmp_general        = self.generalObj.load()

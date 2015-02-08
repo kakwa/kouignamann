@@ -5,20 +5,28 @@ import kouignamann
 import sys
 from optparse import OptionParser
 
+
+
 if __name__ == '__main__':
-    usage = "usage: %prog [-i <inventory directory>] [-f filter] [-k keys]\n\n"\
+    usage = "usage: %prog -i <inventory directory> [-f filter] [-k keys] [-n node]\n\n"\
             "examples:\n"\
             "   %prog -i './inventory/'"
 
     parser = OptionParser(usage=usage)
     parser.add_option("-f", "--filter", dest="filter", 
-            help="search filter",
+            help="search filter (optional)",
             metavar="FILTER")
     parser.add_option("-k", "--keys", dest="keys", 
-            help="keys to recover",
+            help="keys to recover (optional)",
             metavar="KEY")
     parser.add_option("-i", "--inventory", dest="inventory", 
-            help="inventory directory", 
+            help="inventory directory (mandatory)", 
+            metavar="INVDIR")
+    parser.add_option("-n", "--node", dest="node",
+            help="node to recover (optional)", 
+            metavar="INVDIR")
+    parser.add_option("-c", "--category", dest="category",
+            help="category to recober (default: hosts)", 
             metavar="INVDIR")
 
     (options, args) = parser.parse_args()
@@ -38,9 +46,15 @@ if __name__ == '__main__':
         sys.exit(1)
 
 
-    print(inv.general)
-    print(inv.virtualips)
-    print(inv.hardwares)
-    print(inv.partitionings)
-    print(inv.hosts)
+#    print(inv.general)
+#    print(inv.virtualips)
+#    print(inv.hardwares)
+#    print(inv.partitionings)
+#    print(inv.hosts)
+
+#    print('')
+
+    data=inv.search({'ip': '192.168.0..*'})
+    print(inv.format(data))
+
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
