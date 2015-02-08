@@ -2,8 +2,8 @@
 
 import os
 import sys
-from pyyamlwrapper import loadNoDump
-from errors import RelationError, DumplicatedKey
+from kouignamann.pyyamlwrapper import loadNoDump
+from kouignamann.errors import RelationError, DumplicatedKey
 
 class YamlLoad:
 
