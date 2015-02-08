@@ -11,6 +11,9 @@ from yaml.composer import *
 from yaml.constructor import *
 from yaml.resolver import *
 
+from kouignamann.errors import DumplicatedKey, RelationError
+
+
 import yaml
 try:
         from yaml import CLoader as Loader, CDumper as Dumper
@@ -45,8 +48,7 @@ class MyLoader(Reader, Scanner, Parser, Composer, Constructor, Resolver):
                         "found unacceptable key (%s)" % exc, key_node.start_mark)
             value = self.construct_object(value_node, deep=deep)
             if key in mapping:
-                raise ConstructorError("while constructing a mapping", node.start_mark,
-                        "found dumplicate key (%s)" % key)
+                raise DumplicatedKey(key, '')
             mapping[key] = value
         return mapping
 
