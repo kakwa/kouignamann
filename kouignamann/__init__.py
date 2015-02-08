@@ -100,11 +100,15 @@ class Inventory:
         else:
             return False
 
-    def search(self, filters):
+    def search(self, filters, node=None):
         matchHost = {}
-        for host in self.hosts:
-            if self._search(self.hosts[host], filters):
-                matchHost[host]=self.hosts[host]
+        if node is None:
+            for host in self.hosts:
+                if self._search(self.hosts[host], filters):
+                    matchHost[host]=self.hosts[host]
+        else:
+            if self._search(self.hosts[node], filters):
+                matchHost[node]=self.hosts[node]
         return matchHost
 
     def _select(self, data, fields):
@@ -126,12 +130,17 @@ class Inventory:
                         ret[key] = tmp
         return ret
 
-    def select(self, data, fields):
+    def select(self, data, fields, node=None):
         matchHost = {}
-        for host in self.hosts:
-            tmp = self._select(self.hosts[host], fields)
+        if node is None:
+            for host in data:
+                tmp = self._select(data[host], fields)
+                if tmp:
+                    matchHost[host]=tmp
+        else:
+            tmp = self._select(data[node], fields)
             if tmp:
-                matchHost[host]=tmp
+                matchHost[node]=tmp
         return matchHost
 
     def format(self, document):
