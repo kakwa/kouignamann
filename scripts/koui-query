@@ -55,6 +55,7 @@ if __name__ == '__main__':
 #    print('')
 
     data=inv.search({'ip': '192.168.0..*'})
+    data=inv.select(data, ['environment', 'ip'])
     print(inv.format(data))
 
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4

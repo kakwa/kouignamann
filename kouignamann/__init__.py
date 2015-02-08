@@ -108,10 +108,31 @@ class Inventory:
         return matchHost
 
     def _select(self, data, fields):
-        pass
+        ret = []
+        if type(data) is list:
+            ret = []
+            for item in data:
+                tmp = self._select(item, fields)
+                if tmp:
+                    ret.append(tmp)
+        elif type(data) is dict:
+            ret = {}
+            for key in data:
+                if key in fields:
+                    ret[key] = data[key]
+                else:
+                    tmp = self._select(data[key], fields)
+                    if tmp:
+                        ret[key] = tmp
+        return ret
 
     def select(self, data, fields):
-        pass
+        matchHost = {}
+        for host in self.hosts:
+            tmp = self._select(self.hosts[host], fields)
+            if tmp:
+                matchHost[host]=tmp
+        return matchHost
 
     def format(self, document):
         return yaml.dump(document, default_flow_style=False)
