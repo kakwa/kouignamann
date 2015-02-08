@@ -27,7 +27,10 @@ class YamlLoad:
             ymlFiles.extend(map(dirAppend,filenames))
         for ymlFile in ymlFiles:
             stream = open(ymlFile, 'r')
-            content = loadNoDump(stream)
+            try:
+                content = loadNoDump(stream)
+            except DumplicatedKey as e:
+                raise DumplicatedKey(e.host, self.subDir)
             inv = self.mergeNoCollision(inv, content)
         return inv
         
