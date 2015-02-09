@@ -2,9 +2,11 @@
 # virtual ip 2
 sw1:
     ip: 192.168.0.2
+    name: sw1
     aliases: [sw1al1, sw1al2]
 
 # virtual ip 2
 sw2:
     ip: 192.168.0.3
+    name: sw2
     aliases: [sw2al1, sw2al2]
