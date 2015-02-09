@@ -10,7 +10,8 @@ if __name__ == '__main__':
 
     usage = "usage: %prog -i <inventory directory> -o <out dir> -t <template> [-n node]\n\n"\
             "examples:\n"\
-            "   %prog -i inventory/ -t templates/cfg.tmp -o out/ -n host1"
+            "   %prog -i inventory/ -t templates/cfg.tmp -o out/ -n host1\n"\
+            "   %prog -i inventory/ -t templates/dns.templ -m 'global' -p 'db.${general[\"domain\"]}'"
 
     parser = OptionParser(usage=usage)
     parser.add_option("-i", "--inventory", dest="inventory", 
