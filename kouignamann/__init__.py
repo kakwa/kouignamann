@@ -160,11 +160,10 @@ class Inventory:
                     result[fileName]=mytemplate.render(general=self.general, \
                             host=self.hosts[host],  virtualips=self.virtualips)
             else:
-                if self._search(self.hosts[node], filters):
-                    fileName=fileNameTemplate.render(general=self.general, \
-                            host=self.hosts[node], virtualips=self.virtualips)
-                    result[fileName]=mytemplate.render(general=self.general, \
-                            host=self.hosts[node])
+                fileName=fileNameTemplate.render(general=self.general, \
+                        host=self.hosts[node], virtualips=self.virtualips)
+                result[fileName]=mytemplate.render(general=self.general, \
+                        host=self.hosts[node])
         elif mode == 'global':
             fileName=fileNameTemplate.render(general=self.general, \
                     hosts=self.hosts, virtualips=self.virtualips)
