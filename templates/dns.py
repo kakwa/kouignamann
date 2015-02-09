@@ -52,7 +52,24 @@ elif is_valid_ipv6_address(int['ip']):
     record='AAAA ' 
 %>${int['name']}${wide_space}   IN ${record}   ${int['ip']}
         %for alias in int['aliases']:
-<% wide_space=space(alias) %>${alias}${wide_space}   IN CNAME   ${int['name']}
-        % endfor
-    % endfor
-% endfor
+<% 
+wide_space=space(alias) 
+%>${alias}${wide_space}   IN CNAME   ${int['name']}
+        %endfor
+    %endfor
+%endfor
+%for vip in sorted(virtualips):
+<%
+vip=virtualips[vip]
+wide_space=space(vip['name'])
+if is_valid_ipv4_address(vip['ip']):
+    record='A    '
+elif is_valid_ipv6_address(vip['ip']):
+    record='AAAA ' 
+%>${vip['name']}${wide_space}   IN ${record}   ${vip['ip']}
+        %for alias in vip['aliases']: 
+<%  
+wide_space=space(alias)  
+%>${alias}${wide_space}   IN CNAME   ${vip['name']}
+    %endfor
+%endfor
