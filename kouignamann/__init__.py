@@ -147,18 +147,28 @@ class Inventory:
     def format(self, document):
         return yaml.dump(document, default_flow_style=False)
 
-    def templateRender(self, template, node=None, mode='byhost'):
+    def templateRender(self, template, pattern='${host.hostname}', node=None, mode='byhost'):
         mytemplate = Template(filename=template)
+        fileNameTemplate = Template(pattern)
         if mode == 'byhost':
             result = {}
             if node is None:
                 for host in self.hosts:
-                    result[host]=mytemplate.render(general=self.general, host=self.hosts[host])
+                    fileName=fileNameTemplate(general=self.general, \
+                            host=self.hosts[host], virtualIps=self.virtualIps)
+                    result[fileName]=mytemplate.render(general=self.general, \
+                            host=self.hosts[host],  virtualIps=self.virtualIps)
             else:
                 if self._search(self.hosts[node], filters):
-                    result[node]=mytemplate.render(general=self.general, host=self.hosts[node])
+                    fileName=fileNameTemplate(general=self.general, \
+                            host=self.hosts[node], virtualIps=self.virtualIps)
+                    result[fileName]=mytemplate.render(general=self.general, \
+                            host=self.hosts[node])
         elif mode == 'global':
-            result=mytemplate.render(general=self.general, hosts=self.hosts)
+            fileName=fileNameTemplate(general=self.general, \
+                    host=self.hosts, virtualIps=self.virtualIps)
+            result=mytemplate.render(general=self.general, hosts=self.hosts, \
+                    virtualIps=self.virtualIps)
         return result
 
 
