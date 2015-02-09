@@ -12,4 +12,11 @@ $ORIGIN ${general['domain']}.
                          604800 )               ; Negative Cache TTL
 ;
 @       IN      NS     ${general['dns']}.
-
+%for host in hosts:
+    % for int in hosts[host]['network']['interfaces']:
+${int['name']} IN A ${int['ip']}
+        %for alias in int['aliases']:
+${alias} IN CNAME ${int['name']}
+        % endfor
+    % endfor
+% endfor
