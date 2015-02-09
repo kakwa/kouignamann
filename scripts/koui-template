@@ -12,7 +12,8 @@ if __name__ == '__main__':
     usage = "usage: %prog -i <inventory directory> -o <out dir> -t <template> [-n node]\n\n"\
             "examples:\n"\
             "   %prog -i inventory/ -t templates/dns.py -m 'global' -p 'db.${general[\"domain\"]}' -o out/\n"\
-            "   %prog -i inventory/ -t templates/dns.py -m 'global' --stdout"
+            "   %prog -i inventory/ -t templates/dns.py -m 'global' --stdout\n"\
+            "   %prog -i inventory/ -t templates/kickstart.py -m 'byhost' -p '${host[\"hostname\"]}.ks' --stdout"
 
     parser = OptionParser(usage=usage)
     parser.add_option("-i", "--inventory", dest="inventory", 
