@@ -4,14 +4,15 @@ from __future__ import print_function
 import kouignamann
 import sys
 import re
+import os
 from optparse import OptionParser
 
 if __name__ == '__main__':
 
     usage = "usage: %prog -i <inventory directory> -o <out dir> -t <template> [-n node]\n\n"\
             "examples:\n"\
-            "   %prog -i inventory/ -t templates/cfg.tmp -o out/ -n host1\n"\
-            "   %prog -i inventory/ -t templates/dns.py -m 'global' -p 'db.${general[\"domain\"]}'"
+            "   %prog -i inventory/ -t templates/dns.py -m 'global' -p 'db.${general[\"domain\"]}' -o out/\n"\
+            "   %prog -i inventory/ -t templates/dns.py -m 'global' --stdout"
 
     parser = OptionParser(usage=usage)
     parser.add_option("-i", "--inventory", dest="inventory", 
@@ -27,11 +28,15 @@ if __name__ == '__main__':
             help="node to use (optional)", 
             metavar="KEY")
     parser.add_option("-o", "--outdir", dest="outdir",
-            help="out directory (mandatory)", 
+            help="out directory (mandatory if --stdout not used)", 
             metavar="OUTDIR")
     parser.add_option("-m", "--mode", dest="mode",
-            help="mode 'global' or 'byhost' (mandatory)", 
+            help="mode selected, must be in '%(modes)s' (mandatory)" % 
+            {'modes': ', '.join(kouignamann.templateModes)}, 
             metavar="OUTDIR")
+    parser.add_option("-s", "--stdout",
+            action="store_true", dest="stdout", default=False,
+            help="print file(s) content to stdout")
 
     (options, args) = parser.parse_args()
 
@@ -39,11 +44,23 @@ if __name__ == '__main__':
     node      = options.node
     mode      = options.mode
     template  = options.template
+    if template is None:
+        print("ERROR: missing option --template", file=sys.stderr)
+        exit(1)
+    if not os.path.isfile(template):
+        print("ERROR: template '%(templ)s' doesn't exist" % {'templ': template}, file=sys.stderr)
+        exit(1)
+
     inventory = options.inventory
     pattern   = options.pattern
 
     if mode is None:
         mode = 'global'
+
+    if not mode in kouignamann.templateModes:
+        print("ERROR: wrong --mode option, must be in [%(modes)s]" % 
+                {'modes': ', '.join(kouignamann.templateModes)}, 
+                file=sys.stderr)
 
     if inventory is None:
         print("ERROR: missing inventory directory", file=sys.stderr)
@@ -59,7 +76,8 @@ if __name__ == '__main__':
         sys.exit(1)
 
     if not node is None and not node in inv.hosts:
-        print("ERROR: node '%(node)s' not in inventory" % {'node': node}, file=sys.stderr)
+        print("ERROR: node '%(node)s' not in inventory" % 
+                {'node': node}, file=sys.stderr)
         sys.exit(1)
 
     if mode == 'global' and pattern is None:
@@ -67,10 +85,30 @@ if __name__ == '__main__':
     elif mode == 'byhost' and pattern is None:
         pattern="${host['hostname']}.cfg"
 
-
     res=inv.templateRender(template=template, node=node,\
             outFilePattern=pattern, mode=mode)
+
+    if not options.stdout and options.outdir is None:
+        print("ERROR: missing output directory", file=sys.stderr)
+        sys.exit(1)
+
+    if not options.stdout and not os.path.isdir(options.outdir):
+        print("ERROR: out directory %(outdir)s doesn't exist" % 
+                {'outdir': options.outdir}, file=sys.stderr)
+        sys.exit(1)
+
     for r in res:
-        print(r + ':')
-        print(res[r])
+        if options.stdout:
+            print("file '%(file)s':" % {'file': r})
+            print(res[r])
+        else:
+            outfile=os.path.join(options.outdir, r)
+            try:
+                f = open(outfile, 'w')
+            except:
+                print("ERROR: failed to open out file '%(file)s'" % 
+                        {'file': outfile}, file=sys.stderr)
+                exit(1)
+            f.write(res[r])
+            f.close()
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
