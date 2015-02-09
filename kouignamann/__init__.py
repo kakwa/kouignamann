@@ -9,6 +9,7 @@ from kouignamann.errors import RelationError, DumplicatedKey
 from mako.template import Template
 
 categories = ['partitionings','virtual-ips','hosts','hardwares', 'general']
+templateModes = ['byhost', 'global']
 
 class YamlLoad:
 
