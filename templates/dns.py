@@ -29,7 +29,7 @@ def space(string):
     return ' ' * lenght
 %>; File auto generated
 ;
-; BIND data file for zone ${general['domain']
+; BIND data file for zone "${general['domain']}"
 ;
 $TTL    604800
 $ORIGIN ${general['domain']}.
