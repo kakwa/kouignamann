@@ -33,14 +33,15 @@ def space(string):
 ;
 $TTL    604800
 $ORIGIN ${general['domain']}.
-@       IN      SOA     ${general['dns']}. root.${general['dns']}. (
+@       IN      SOA     ${general['dns']}.${general['domain']}. root.${general['dns']}.${general['domain']}. (
                      ${serial_time}                 ; Serial
                          604800                 ; Refresh
                           86400                 ; Retry
                         2419200                 ; Expire
                          604800 )               ; Negative Cache TTL
 ;
-@       IN      NS     ${general['dns']}.
+@       IN      NS     ${general['dns']}.${general['domain']}.
+
 %for host in sorted(hosts):
     %for int in hosts[host]['network']['interfaces']:
 <%
