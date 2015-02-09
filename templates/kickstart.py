@@ -13,6 +13,14 @@ network --device ${interface['device']} --activate \
 --gateway=${host['network']['default-gateway']} \
 --nameserver=${general['dnsip']} \
 --hostname=${host['hostname']}.${general['domain']}
+%for altdevice in interface['device-alt-names']:
+network --device ${altdevice} --activate \
+--onboot=yes --bootproto=static \
+--ip=${interface['ip']} --netmask=${interface['mask']} \
+--gateway=${host['network']['default-gateway']} \
+--nameserver=${general['dnsip']} \
+--hostname=${host['hostname']}.${general['domain']}
+%endfor
 %endfor
 
 repo --name=base --baseurl="${general["mirror"]}/centos/7/os/x86_64/"
