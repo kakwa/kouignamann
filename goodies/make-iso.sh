@@ -44,10 +44,15 @@ clean(){
     fi
 }
 
+clean_exit(){
+    clean
+    exit 1
+}
+
 error(){
     msg="$1"
     printf "${BRed}[ERROR]${Yel} ${msg}${RCol}\n"
-    clean
+    clean 
     exit 1
 }
 
@@ -56,7 +61,7 @@ info_msg(){
     printf "${BBlu}[INFO] ${Gre}${msg}${RCol}\n"
 }
 
-trap clean HUP INT TERM
+trap clean_exit HUP INT TERM
 
 while getopts ":hi:I:o:t:T:" opt; do
   case $opt in
@@ -143,5 +148,8 @@ koui-template -i inventory/ -t ${TEMPLATEDIR}/sysconfig.py \
     -m 'global' -p 'isolinux.cfg' -o $tmpdir/new_iso/isolinux/ || error "Failed to generate syslinux menu"
 
 info_msg "Create syslinux menu"
-$MKISO -r -T -J -V "Custom Centos Build" -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4  -boot-info-table -o "$OUT" "$tmpdir/new_iso/" || error "Failed to build out iso ${OUT}"
+$MKISO -r -T -J -V "Custom Centos Build" -b isolinux/isolinux.bin \
+	-c isolinux/boot.cat -no-emul-boot -boot-load-size 4  \
+	-input-charset 'utf-8' -boot-info-table -o "$OUT" \
+	"$tmpdir/new_iso/" || error "Failed to build out iso ${OUT}"
 clean
