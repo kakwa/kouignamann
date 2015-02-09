@@ -61,6 +61,7 @@ if __name__ == '__main__':
         print("ERROR: wrong --mode option, must be in [%(modes)s]" % 
                 {'modes': ', '.join(kouignamann.templateModes)}, 
                 file=sys.stderr)
+        sys.exit(1)
 
     if inventory is None:
         print("ERROR: missing inventory directory", file=sys.stderr)
