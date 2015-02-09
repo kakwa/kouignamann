@@ -39,14 +39,14 @@ if __name__ == '__main__':
         print("ERROR: missing inventory directory", file=sys.stderr)
         sys.exit(1)
 
-    if not node is None and not node in inv.virtualIps:
+    if not node is None and not node in inv.virtualips:
         print("ERROR: node '%(node)s' not in inventory" % {'node': node}, file=sys.stderr)
         sys.exit(1)
 
     if not node is None:
-        data[node] = inv.virtualIps[node]
+        data[node] = inv.virtualips[node]
     else:
-        data = inv.virtualIps
+        data = inv.virtualips
 
     print(inv.format(data))
 
