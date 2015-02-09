@@ -2,10 +2,14 @@
 part1:
     volume-groups:
         - device: /dev/sda
+          name: OS
           parts:
               - name: ROOT
                 size: 1024
                 mount-point: /
+              - name: BOOT
+                size: 1024
+                mount-point: /boot
               - name: USR
                 size: 5120
                 mount-point: /usr
@@ -14,15 +18,18 @@ part1:
                 mount-point: /var
                 grow: true
         - device: /dev/sdb
+          name: DATA
           parts:
               - name: DATA
                 size: 1024
                 mount-point: /var/data
+                grow: true
 
 # partitioning 2
 part2:
     volume-groups:
         - device: /dev/sda
+          name: OS
           parts:
               - name: ROOT
                 size: 1024
