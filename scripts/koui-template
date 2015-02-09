@@ -19,6 +19,9 @@ if __name__ == '__main__':
     parser.add_option("-t", "--template", dest="template", 
             help="template (mandatory)", 
             metavar="TEMP")
+    parser.add_option("-p", "--pattern", dest="pattern", 
+            help="out file pattern (optional)", 
+            metavar="PATTERN")
     parser.add_option("-n", "--node", dest="node",
             help="node to use (optional)", 
             metavar="KEY")
@@ -33,8 +36,13 @@ if __name__ == '__main__':
 
     data = {}
     node      = options.node
+    mode      = options.mode
     template  = options.template
     inventory = options.inventory
+    pattern   = options.pattern
+
+    if mode is None:
+        mode = 'global'
 
     if inventory is None:
         print("ERROR: missing inventory directory", file=sys.stderr)
@@ -53,7 +61,14 @@ if __name__ == '__main__':
         print("ERROR: node '%(node)s' not in inventory" % {'node': node}, file=sys.stderr)
         sys.exit(1)
 
-    res=inv.templateRender(template, node)
+    if mode == 'global' and pattern is None:
+        pattern='out.cfg'
+    elif mode == 'byhost' and pattern is None:
+        pattern="${host['hostname']}.cfg"
+
+
+    res=inv.templateRender(template=template, node=node,\
+            outFilePattern=pattern, mode=mode)
     for r in res:
         print(r + ':')
         print(res[r])
