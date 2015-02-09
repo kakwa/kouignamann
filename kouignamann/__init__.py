@@ -147,28 +147,28 @@ class Inventory:
     def format(self, document):
         return yaml.dump(document, default_flow_style=False)
 
-    def templateRender(self, template, pattern='${host.hostname}', node=None, mode='byhost'):
+    def templateRender(self, template, outFilePattern, node=None, mode='byhost'):
+        fileNameTemplate = Template(outFilePattern)
         mytemplate = Template(filename=template)
-        fileNameTemplate = Template(pattern)
+        result = {}
         if mode == 'byhost':
-            result = {}
             if node is None:
                 for host in self.hosts:
-                    fileName=fileNameTemplate(general=self.general, \
-                            host=self.hosts[host], virtualIps=self.virtualIps)
+                    fileName=fileNameTemplate.render(general=self.general, \
+                            host=self.hosts[host], virtualips=self.virtualips)
                     result[fileName]=mytemplate.render(general=self.general, \
-                            host=self.hosts[host],  virtualIps=self.virtualIps)
+                            host=self.hosts[host],  virtualips=self.virtualips)
             else:
                 if self._search(self.hosts[node], filters):
-                    fileName=fileNameTemplate(general=self.general, \
-                            host=self.hosts[node], virtualIps=self.virtualIps)
+                    fileName=fileNameTemplate.render(general=self.general, \
+                            host=self.hosts[node], virtualips=self.virtualips)
                     result[fileName]=mytemplate.render(general=self.general, \
                             host=self.hosts[node])
         elif mode == 'global':
-            fileName=fileNameTemplate(general=self.general, \
-                    host=self.hosts, virtualIps=self.virtualIps)
-            result=mytemplate.render(general=self.general, hosts=self.hosts, \
-                    virtualIps=self.virtualIps)
+            fileName=fileNameTemplate.render(general=self.general, \
+                    hosts=self.hosts, virtualips=self.virtualips)
+            result[fileName]=mytemplate.render(general=self.general, hosts=self.hosts, \
+                    virtualips=self.virtualips)
         return result
 
 
