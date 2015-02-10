@@ -48,7 +48,7 @@ url 		     --url="${general["mirror"]}/centos/7/os/x86_64/"
 selinux --disabled
 firewall --disabled
 eula --agreed
-ignoredisk --only-use=sda
+
 reboot
 
 # UEFI/GPT or bios
@@ -260,22 +260,25 @@ echo "${route['network']}/${mask} via ${route['gateway']}" >>/etc/sysconfig/stat
 find /etc/yum.repos.d/ -type f |while read line; do echo > "$line";done
 
 # configure rpm repos (CentOS and Epel
-echo '[base]' >>/etc/yum.repos.d/CentOS.repo
-echo 'name=CentOS-$releasever - Base' >>/etc/yum.repos.d/centos.repo
-echo 'baseurl=${general["mirror"]}/centos/$releasever/os/$basearch/' >>/etc/yum.repos.d/centos.repo
-echo 'gpgcheck=1' >>/etc/yum.repos.d/centos.repo
-echo 'gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-$releasever' >>/etc/yum.repos.d/centos.repo
-echo '' >>/etc/yum.repos.d/centos.repo
-echo '[updates]' >>/etc/yum.repos.d/centos.repo
-echo 'name=CentOS-$releasever - Updates' >>/etc/yum.repos.d/centos.repo
-echo 'baseurl=${general["mirror"]}/centos/$releasever/updates/$basearch/' >>/etc/yum.repos.d/centos.repo
-echo 'gpgcheck=1' >>/etc/yum.repos.d/centos.repo
-echo 'gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-$releasever' >>/etc/yum.repos.d/centos.repo
+cat >/etc/yum.repos.d/CentOS.repo <<EOF
+[base]
+name=CentOS-\$releasever - Base
+baseurl=${general["mirror"]}/centos/\$releasever/os/\$basearch/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-\$releasever
+[updates]
+name=CentOS-\$releasever - Updates
+baseurl=${general["mirror"]}/centos/\$releasever/updates/\$basearch/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-\$releasever
+EOF
 
-echo '[Epel]' >>/etc/yum.repos.d/Epel.repo
-echo 'name=Extra Packages for Enterprise Linux $releasever - $basearch' >>/etc/yum.repos.d/epel.repo
-echo 'baseurl=${general["mirror"]}/epel/$releasever/$basearch' >>/etc/yum.repos.d/epel.repo
-echo 'gpgcheck=0' >>/etc/yum.repos.d/epel.repo
+cat >/etc/yum.repos.d/Epel.repo <<EOF
+[Epel]
+name=Extra Packages for Enterprise Linux \$releasever - \$basearch
+baseurl=${general["mirror"]}/epel/\$releasever/\$basearch
+gpgcheck=0
+EOF
 
 %if 'puppetserver' in general:
 
