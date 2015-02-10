@@ -43,7 +43,8 @@ part biosboot --fstype=biosboot --size=1
 lang en_US.UTF-8
 keyboard us
 
-##partition /boot --fstype "ext4" --size=512 --ondisk
+# need separated /boot/ (not in lvm)
+partition /boot --fstype "ext4" --size=512
 ##part pv.01 --size 1 --grow
 ##logvol swap	--fstype swap --name=lvSwap		--vgname=OS_VOL --size=2048 #2Go swap
 # partitions
