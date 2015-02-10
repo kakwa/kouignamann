@@ -28,6 +28,7 @@ def space(string):
     lenght = 20 - len(string)
     return ' ' * lenght
 %>; File auto generated
+## Zone file header
 ;
 ; BIND data file for zone "${general['domain']}"
 ;
@@ -50,11 +51,17 @@ if is_valid_ipv4_address(int['ip']):
     record='A    '
 elif is_valid_ipv6_address(int['ip']):
     record='AAAA ' 
-%>${int['name']}${wide_space}   IN ${record}   ${int['ip']}
+%>\
+## Writing the A or AAAA DNS records for hosts
+${int['name']}${wide_space}   IN ${record}   ${int['ip']}\
+
         %for alias in int['aliases']:
 <% 
 wide_space=space(alias) 
-%>${alias}${wide_space}   IN CNAME   ${int['name']}
+%>\
+## Writing the CNAME (aliases) DNS records for hosts
+${alias}${wide_space}   IN CNAME   ${int['name']}\
+
         %endfor
     %endfor
 %endfor
@@ -66,10 +73,16 @@ if is_valid_ipv4_address(vip['ip']):
     record='A    '
 elif is_valid_ipv6_address(vip['ip']):
     record='AAAA ' 
-%>${vip['name']}${wide_space}   IN ${record}   ${vip['ip']}
+%>\
+## Writing the A or AAAA DNS records for virtual-ips
+${vip['name']}${wide_space}   IN ${record}   ${vip['ip']}\
+
         %for alias in vip['aliases']: 
 <%  
 wide_space=space(alias)  
-%>${alias}${wide_space}   IN CNAME   ${vip['name']}
+%>\
+## Writing the CNAME DNS records (aliases) for virtual-ips
+${alias}${wide_space}   IN CNAME   ${vip['name']}\
+
     %endfor
 %endfor
