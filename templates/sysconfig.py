@@ -27,9 +27,8 @@ menu tabmsg Press Tab for full configuration options on menu items.
 label ${hosts[host]['hostname']}
   menu label Install CentOS 7 with ${hosts[host]['hostname']}.ks
   kernel vmlinuz
-  append initrd=initrd.img inst.stage2=hd:LABEL=CentOS\x207\x20x86_64 \
- nomodeset ks=cdrom:/${hosts[host]['hostname']}.ks \
- repo=${general['mirror']}/centos/7/os/x86_64/ loglevel=debug debug=1
+  append initrd=initrd.img inst.ks=cdrom:/${hosts[host]['hostname']}.ks \
+ inst.repo=${general['mirror']}/centos/7/os/x86_64/ loglevel=debug debug=1
 
 %endfor
 
