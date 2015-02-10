@@ -16,17 +16,21 @@ CACHEDIR='/tmp/ISO/'
 
 help(){
   cat <<EOF
-usage: `basename $0` <args>
+Usage: 
+	`basename $0` -i <input iso url> -I <inventory> \\
+	  -T <template dir> -o <out iso> \\
+	  [-t <tmp dir>] [-c cache dir]
 
-build an iso with kickstart selection at the start
+Description:
+	Build an iso with kickstart selection in syslinux (boot menu)
 
-example:
+`basename $0` must be executed as root
+
+Example:
 	`basename $0` -i \\
-	http://mirror-fr1.bbln.org/centos/7.0.1406/isos/x86_64/CentOS-7.0-1406-x86_64-NetInstall.iso \\
+	http://mirror-fr1.bbln.org/centos/7/isos/x86_64/CentOS-7.0-1406-x86_64-NetInstall.iso \\
 	-I inventory/ -o ./test2.iso -T templates/
 
-arguments:
-  <options>
 EOF
   exit 1
 }
@@ -63,7 +67,7 @@ info_msg(){
 
 trap clean_exit HUP INT TERM
 
-while getopts ":hi:I:o:t:T:" opt; do
+while getopts ":hi:I:o:t:T:c:" opt; do
   case $opt in
 
     h) 
@@ -78,11 +82,11 @@ while getopts ":hi:I:o:t:T:" opt; do
     o)
         OUT="$OPTARG"
         ;;
-    t)
-        export TMPDIR="$OPTARG"
-        ;;
     T)
         TEMPLATEDIR="$OPTARG"
+        ;;
+    t)
+        export TMPDIR="$OPTARG"
         ;;
     c)
         CACHEDIR="$OPTARG"
