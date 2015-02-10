@@ -148,7 +148,7 @@ koui-template -i ${INV} -t ${TEMPLATEDIR}/kickstart.py \
     -m 'byhost' -p '${host["hostname"]}.ks' -o $tmpdir/new_iso/ || error "Failed to generate kickstarts"
 
 info_msg "Create syslinux menu"
-koui-template -i inventory/ -t ${TEMPLATEDIR}/sysconfig.py \
+koui-template -i ${INV} -t ${TEMPLATEDIR}/sysconfig.py \
     -m 'global' -p 'isolinux.cfg' -o $tmpdir/new_iso/isolinux/ || error "Failed to generate syslinux menu"
 
 info_msg "Create syslinux menu"
