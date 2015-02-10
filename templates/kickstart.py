@@ -1,5 +1,23 @@
 # Kickstart file for ${host["hostname"]}
+<%!
+def ipv4_cidr_to_netmask(bits):
+    """ Convert CIDR bits to netmask """
+    netmask = ''
+    for i in range(4):
+        if i:
+            netmask += '.'
+        if bits >= 8:
+            netmask += '%d' % (2**8-1)
+            bits -= 8
+        else:
+            netmask += '%d' % (256-2**(8-bits))
+            bits = 0
+    return netmask
 
+def ipv4_netmask_to_cidr(netmask):
+    """ convert netmask to CIDR """
+    return map(lambda x: ipv4_cidr_to_netmask(x), range(0,33)).index(netmask)
+%>\
 text
 reboot --eject
 skipx
@@ -10,14 +28,14 @@ install
 network --device ${interface['device']} --activate \
 --onboot=yes --bootproto=static \
 --ip=${interface['ip']} --netmask=${interface['mask']} \
---gateway=${host['network']['default-gateway']} \
+##--gateway=${host['network']['default-gateway']} \
 --nameserver=${general['dnsip']} \
 --hostname=${host['hostname']}.${general['domain']}
 %for altdevice in interface['device-alt-names']:
 network --device ${altdevice} --activate \
 --onboot=yes --bootproto=static \
 --ip=${interface['ip']} --netmask=${interface['mask']} \
---gateway=${host['network']['default-gateway']} \
+##--gateway=${host['network']['default-gateway']} \
 --nameserver=${general['dnsip']} \
 --hostname=${host['hostname']}.${general['domain']}
 %endfor
@@ -88,8 +106,10 @@ vim
 iptables
 file
 man
-puppet
 wget
+%if 'puppetserver' in general:
+puppet
+%endif
 
 # Packages inutiles 
 -alsa-firmware
@@ -224,13 +244,23 @@ do
 done
 
 echo "# Disable ZEROCONF"
-echo "NOZEROCONF=yes">>/etc/sysconfig/network
+echo "NOZEROCONF=yes" >>/etc/sysconfig/network
+
+echo "# Set Default Gateway"
+echo "GATEWAY='${host['network']['default-gateway']}'" >>/etc/sysconfig/network 
+
+
+echo "# Set static routes"
+%for route in host['network']['routes']:
+<% mask=ipv4_netmask_to_cidr(route['mask']) %>\
+echo "${route['network']}/${mask} via ${route['gateway']}" >>/etc/sysconfig/static-routes
+%endfor
 
 # clean default rpm repos configuration
 find /etc/yum.repos.d/ -type f |while read line; do echo > "$line";done
 
-# configure rpm repos
-echo '[base]' >>/etc/yum.repos.d/centos.repo
+# configure rpm repos (CentOS and Epel
+echo '[base]' >>/etc/yum.repos.d/CentOS.repo
 echo 'name=CentOS-$releasever - Base' >>/etc/yum.repos.d/centos.repo
 echo 'baseurl=${general["mirror"]}/centos/$releasever/os/$basearch/' >>/etc/yum.repos.d/centos.repo
 echo 'gpgcheck=1' >>/etc/yum.repos.d/centos.repo
@@ -242,13 +272,37 @@ echo 'baseurl=${general["mirror"]}/centos/$releasever/updates/$basearch/' >>/etc
 echo 'gpgcheck=1' >>/etc/yum.repos.d/centos.repo
 echo 'gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-$releasever' >>/etc/yum.repos.d/centos.repo
 
-echo '[epel]' >>/etc/yum.repos.d/epel.repo
+echo '[Epel]' >>/etc/yum.repos.d/Epel.repo
 echo 'name=Extra Packages for Enterprise Linux $releasever - $basearch' >>/etc/yum.repos.d/epel.repo
 echo 'baseurl=${general["mirror"]}/epel/$releasever/$basearch' >>/etc/yum.repos.d/epel.repo
 echo 'gpgcheck=0' >>/etc/yum.repos.d/epel.repo
 
+%if 'puppetserver' in general:
+
+echo "# Puppet Client Configuration"
+# configure puppet client
+cat >/etc/puppet/puppet.conf <<EOF
+[main]
+logdir=/var/log/puppet
+vardir=/var/lib/puppet
+ssldir=/var/lib/puppet/ssl
+rundir=/var/run/puppet
+factpath=$vardir/lib/facter
+templatedir=$confdir/templates
+
+[agent]
+server      = ${general['puppetserver']}
+certname    = ${host['hostname']}.${general['domain']}
+environment = ${host['environment']}
+pluginsync  = true
+runinterval = 600
+EOF
+
+
 # enable puppet
 chkconfig puppet on
-) 
+/usr/bin/systemctl enable puppet
+%endif
+) >/root/post.log 2>&1
 
 %%end

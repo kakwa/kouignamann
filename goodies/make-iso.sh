@@ -131,7 +131,7 @@ then
     curl --fail --compressed -O $IN || error "Unable to download iso '$IN'"
     cd -  >/dev/null 2>&1
 else
-    info_msg "Iso '`basename ${IN}`' already download in '${CACHEDIR}'"
+    info_msg "Iso '`basename ${IN}`' already downloaded in '${CACHEDIR}'"
 fi
 
 mkdir -p $tmpdir/iso/ &&
@@ -151,7 +151,7 @@ info_msg "Create syslinux menu"
 koui-template -i ${INV} -t ${TEMPLATEDIR}/sysconfig.py \
     -m 'global' -p 'isolinux.cfg' -o $tmpdir/new_iso/isolinux/ || error "Failed to generate syslinux menu"
 
-info_msg "Create syslinux menu"
+info_msg "Build the new iso '$OUT'"
 $MKISO -r -T -J -V "Custom Centos Build" -b isolinux/isolinux.bin \
 	-c isolinux/boot.cat -no-emul-boot -boot-load-size 4  \
 	-input-charset 'utf-8' -boot-info-table -o "$OUT" \
