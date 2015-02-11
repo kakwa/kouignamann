@@ -111,7 +111,7 @@ wget
 puppet
 %endif
 
-# Packages inutiles 
+# Useless Packages
 -alsa-firmware
 -alsa-lib
 -alsa-tools-firmware
@@ -195,14 +195,13 @@ puppet
 -sendmail
 -iptables-ipv6
 -subscription-manager
+-tuned
 %%end
 
 %%pre
 
 # suppress lvm volumes
 vgscan |sed -n 's/.*"\(.*\)"/\1/' |while read v; do vgremove -f "$v";done
-# trick anaconda in order to prevent hd reinitialization check box
-dd if=/dev/zero of=/dev/sda bs=512 count=1000
 
 # gpt or mbr label
 %for vg in host['partitioning']['volume-groups']:
@@ -212,6 +211,7 @@ if host['hardware']['bootloader'] == 'uefi':
 else:
     mode='msdos'
 %>\
+dd if=/dev/zero of=${vg['device']} bs=512 count=1000
 /usr/sbin/parted -s ${vg['device']} mklabel ${mode}
 %endfor
 
@@ -237,7 +237,11 @@ cp /etc/resolv.conf /mnt/sysimage/etc/resolv.conf
 (
 
 echo "# disable useless services"
-for s in `echo "irda lm_sensors portmap rawdevices rpcidmapd rpcsvcgssd sendmail xinetd ip6tables netfs kudzu rhnsd rhsmcertd netconsole abrtd acpid atd avahi-daemon autofs bluetooth irqbalance kdump mdmonitor nfslock portreserve postfix psacct rdisc restorecond rpcbind rpcgssd sysstat auditd"`
+for s in `echo "irda lm_sensors portmap rawdevices rpcidmapd rpcsvcgssd \
+ sendmail xinetd ip6tables netfs kudzu rhnsd rhsmcertd netconsole abrtd \
+ acpid atd avahi-daemon autofs bluetooth irqbalance kdump mdmonitor \
+ nfslock portreserve postfix psacct rdisc restorecond rpcbind rpcgssd \
+ sysstat auditd tuned"`
 do
 /sbin/chkconfig $s off
 /usr/bin/systemctl disable $s
@@ -291,7 +295,6 @@ vardir=/var/lib/puppet
 ssldir=/var/lib/puppet/ssl
 rundir=/var/run/puppet
 factpath=$vardir/lib/facter
-templatedir=$confdir/templates
 
 [agent]
 server      = ${general['puppetserver']}
