@@ -5,12 +5,13 @@ import random
 imgdir = os.getenv("IMGDIR", "/var/lib/kvm/")
 slot=1
 
+global diskLetter
 diskLetter='a'
 
 # increment disk letter
 def nextDiskLetter():
     global diskLetter
-    diskLetter = chr(ord(disk) + 1)
+    diskLetter = chr(ord(diskLetter) + 1)
 
 # init mac calculation 
 # Fixed OUI
@@ -61,20 +62,29 @@ randomMacInit()
   <on_crash>restart</on_crash>
   <devices>
     <emulator>/usr/libexec/qemu-kvm</emulator>
-<%counter=0%>\
+
+## disks declaration
+<%counter=0
+id=str(counter)
+%>\
 %for vg in host['partitioning']['volume-groups']:
     <disk type='file' device='disk'>
       <driver name='qemu' type='qcow2' cache='none'/>
-      <source file='${imgdir}/TESTVM.img'/>
-      <target dev='sda' bus='scsi'/>
-      <address type='drive' controller='0' bus='0' target='0' unit='0'/>
+      <source file='${imgdir}/${host['hostname']}_${id}.img'/>
+      <target dev='sd${diskLetter}' bus='scsi'/>
+      <address type='drive' controller='0' bus='${id}' target='0' unit='0'/>
     </disk>
+<%counter= counter + 1
+id=str(counter)
+nextDiskLetter()
+%>\
 %endfor
+
     <disk type='block' device='cdrom'>
       <driver name='qemu' type='raw'/>
-      <target dev='hdc' bus='ide'/>
+      <target dev='hd${diskLetter}' bus='ide'/>
       <readonly/>
-      <address type='drive' controller='0' bus='1' target='0' unit='0'/>
+      <address type='drive' controller='0' bus='${id}' target='0' unit='0'/>
     </disk>
     <controller type='scsi' index='0' model='virtio-scsi'>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x06' function='0x0'/>
@@ -89,24 +99,21 @@ randomMacInit()
     <controller type='virtio-serial' index='0'>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x07' function='0x0'/>
     </controller>
+
+## Interface declaration
+<% counter=0 %>
+%for interface in host['network']['interfaces']:
+<% mac=getMac()
+slot="%02x" % counter
+counter = counter + 1%>\
     <interface type='network'>
-      <mac address='52:54:00:80:ca:da'/>
-      <source network='prd'/>
+      <mac address='${mac}'/>
+      <source network='${interface['type']}'/>
       <model type='e1000'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x${slot}' function='0x3'/>
     </interface>
-    <interface type='network'>
-      <mac address='52:54:00:b9:e1:bf'/>
-      <source network='adm'/>
-      <model type='e1000'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x04' function='0x0'/>
-    </interface>
-    <interface type='network'>
-      <mac address='52:54:00:20:c1:a2'/>
-      <source network='internal'/>
-      <model type='e1000'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x09' function='0x0'/>
-    </interface>
+%endfor
+
     <serial type='pty'>
       <target port='0'/>
     </serial>
