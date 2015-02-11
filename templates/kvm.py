@@ -2,7 +2,7 @@
 import uuid
 import os
 import random
-imgdir = os.getenv("IMGDIR", "/var/lib/kvm/")
+imgdir = os.getenv("IMGDIR", "/var/lib/kvm")
 slot=1
 
 global diskLetter
