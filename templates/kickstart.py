@@ -31,6 +31,7 @@ network --device ${interface['device']} --activate \
 ##--gateway=${host['network']['default-gateway']} \
 --nameserver=${general['dnsip']} \
 --hostname=${host['hostname']}.${general['domain']}
+
 %for altdevice in interface['device-alt-names']:
 network --device ${altdevice} --activate \
 --onboot=yes --bootproto=static \
@@ -38,6 +39,7 @@ network --device ${altdevice} --activate \
 ##--gateway=${host['network']['default-gateway']} \
 --nameserver=${general['dnsip']} \
 --hostname=${host['hostname']}.${general['domain']}
+
 %endfor
 %endfor
 
