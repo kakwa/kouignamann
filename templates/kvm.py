@@ -1,9 +1,51 @@
+<%
+import uuid
+import os
+import random
+imgdir = os.getenv("IMGDIR", "/var/lib/kvm/")
+slot=1
+
+diskLetter='a'
+
+# increment disk letter
+def nextDiskLetter():
+    global diskLetter
+    diskLetter = chr(ord(disk) + 1)
+
+# init mac calculation 
+# Fixed OUI
+# random NIC specific first 2 bytes (but common to all interfaces)
+# random last byte, incremented for each interface
+# this methods limits the number of interfaces to 128
+def randomMacInit():
+    global lastMac
+    global baseMac
+    lastMac=random.randint(0x00, 0xef)
+    baseMac = [ 0x52, 0x54, 0x00,
+            random.randint(0x00, 0x7f),
+            random.randint(0x00, 0xff) ]
+
+# get a semi-random mac address
+def getMac():
+    global lastMac
+    global baseMac
+    mac = list(baseMac)
+    mac.append(lastMac)
+    lastMac = lastMac + 1
+    return ':'.join(map(lambda x: "%02x" % x, mac))
+
+randomMacInit()
+
+%>\
 <domain type='kvm'>
-  <name>TESTVM</name>
-  <uuid>8961e333-7c09-a545-7ebb-b93b977ea7fb</uuid>
-  <memory unit='KiB'>4194304</memory>
-  <currentMemory unit='KiB'>4194304</currentMemory>
-  <vcpu placement='static'>4</vcpu>
+  <name>${host['hostname']}</name>
+  <% uuid=uuid.uuid1() %>\
+  <uuid>${uuid}</uuid>
+  <% memory=str(host['hardware']['ram'] * 1024) %>\
+  <memory unit='KiB'>${memory}</memory>
+  <currentMemory unit='KiB'>${memory}</currentMemory>
+  <% cpus=str(host['hardware']['cpus']) %>\
+  <vcpu placement='static'>${cpus}</vcpu>
   <os>
     <type arch='x86_64' machine='pc-i440fx-rhel7.0.0'>hvm</type>
     <boot dev='hd'/>
@@ -19,12 +61,15 @@
   <on_crash>restart</on_crash>
   <devices>
     <emulator>/usr/libexec/qemu-kvm</emulator>
+<%counter=0%>\
+%for vg in host['partitioning']['volume-groups']:
     <disk type='file' device='disk'>
       <driver name='qemu' type='qcow2' cache='none'/>
-      <source file='/var/lib/kvm/TESTVM.img'/>
+      <source file='${imgdir}/TESTVM.img'/>
       <target dev='sda' bus='scsi'/>
       <address type='drive' controller='0' bus='0' target='0' unit='0'/>
     </disk>
+%endfor
     <disk type='block' device='cdrom'>
       <driver name='qemu' type='raw'/>
       <target dev='hdc' bus='ide'/>
