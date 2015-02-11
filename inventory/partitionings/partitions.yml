@@ -7,9 +7,6 @@ part1:
               - name: ROOT
                 size: 1024
                 mount-point: /
-              - name: BOOT
-                size: 1024
-                mount-point: /boot
               - name: USR
                 size: 5120
                 mount-point: /usr
