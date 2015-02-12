@@ -28,7 +28,17 @@ label ${hosts[host]['hostname']}
   menu label Install CentOS 7 with ${hosts[host]['hostname']}.ks
   kernel vmlinuz
   append initrd=initrd.img inst.ks=cdrom:/${hosts[host]['hostname']}.ks \
- inst.repo=${general['mirror']}/centos/7/os/x86_64/ loglevel=debug debug=1
+ inst.repo=${general['mirror']}/centos/7/os/x86_64/ loglevel=debug debug=1 \
+%for interface in hosts[host]['network']['interfaces']:
+ip=${interface['ip']}::${hosts[host]['network']['default-gateway']}:${interface['mask']}:${hosts[host]['hostname']}:${interface['device']}:none \
+%for altdevice in interface['device-alt-names']:
+ip=${interface['ip']}::${hosts[host]['network']['default-gateway']}:${interface['mask']}:${hosts[host]['hostname']}:${altdevice}:none \
+%endfor
+%endfor
+nameserver=${general['dnsip']}
+
+
+ ip=none
 
 %endfor
 
