@@ -3,6 +3,7 @@ import uuid
 import os
 import random
 imgdir = os.getenv("IMGDIR", "/var/lib/kvm")
+isopath = os.getenv("ISOPATH", "/var/lib/kvm/isos/CentOS-7-custom-install.iso")
 slot=1
 
 global diskLetter
@@ -50,6 +51,7 @@ randomMacInit()
   <os>
     <type arch='x86_64' machine='pc-i440fx-rhel7.0.0'>hvm</type>
     <boot dev='hd'/>
+    <boot dev='cdrom'/>
   </os>
   <features>
     <acpi/>
@@ -82,6 +84,7 @@ nextDiskLetter()
 
     <disk type='block' device='cdrom'>
       <driver name='qemu' type='raw'/>
+      <source file='${isopath}'/>
       <target dev='hd${diskLetter}' bus='ide'/>
       <readonly/>
       <address type='drive' controller='0' bus='${id}' target='0' unit='0'/>
@@ -101,7 +104,7 @@ nextDiskLetter()
     </controller>
 
 ## Interface declaration
-<% counter=0 %>
+<% counter=1 %>
 %for interface in host['network']['interfaces']:
 <% mac=getMac()
 slot="%02x" % counter
@@ -110,7 +113,7 @@ counter = counter + 1%>\
       <mac address='${mac}'/>
       <source network='${interface['type']}'/>
       <model type='e1000'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x${slot}' function='0x3'/>
+      <address type='pci' domain='0x0000' bus='0x01' slot='0x${slot}' function='0x0'/>
     </interface>
 %endfor
 
