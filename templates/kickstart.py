@@ -25,18 +25,18 @@ install
 
 # network configuration
 %for interface in host['network']['interfaces']:
-network --device ${interface['device']} --activate \
+network --device=${interface['device']} --activate \
 --onboot=yes --bootproto=static \
 --ip=${interface['ip']} --netmask=${interface['mask']} \
-##--gateway=${host['network']['default-gateway']} \
+--gateway=${host['network']['default-gateway']} \
 --nameserver=${general['dnsip']} \
 --hostname=${host['hostname']}.${general['domain']}
 
 %for altdevice in interface['device-alt-names']:
-network --device ${altdevice} --activate \
+network --device=${altdevice} --activate \
 --onboot=yes --bootproto=static \
 --ip=${interface['ip']} --netmask=${interface['mask']} \
-##--gateway=${host['network']['default-gateway']} \
+--gateway=${host['network']['default-gateway']} \
 --nameserver=${general['dnsip']} \
 --hostname=${host['hostname']}.${general['domain']}
 
@@ -257,10 +257,12 @@ echo "GATEWAY='${host['network']['default-gateway']}'" >>/etc/sysconfig/network
 
 
 echo "# Set static routes"
+%if 'routes' in host['network']:
 %for route in host['network']['routes']:
 <% mask=ipv4_netmask_to_cidr(route['mask']) %>\
 echo "${route['network']}/${mask} via ${route['gateway']}" >>/etc/sysconfig/static-routes
 %endfor
+%endif
 
 # clean default rpm repos configuration
 find /etc/yum.repos.d/ -type f |while read line; do echo > "$line";done
