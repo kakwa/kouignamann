@@ -28,9 +28,9 @@ class YamlLoad:
         ymlFiles = []
         inv = {}
         for (dirpath, dirnames, filenames) in os.walk(ymlDir):
-            def dirAppend(yml):
-                return os.path.join(dirpath, yml)
-            ymlFiles.extend(map(dirAppend,filenames))
+            for f in filenames:
+                if f.endswith('.yml') and not f.startswith('.'):
+                    ymlFiles.append(os.path.join(dirpath, f))
         for ymlFile in ymlFiles:
             stream = open(ymlFile, 'r')
             try:
